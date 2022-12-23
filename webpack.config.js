@@ -1,15 +1,18 @@
 const path = require('path');
+const mode = process.env.NODE_ENV;
 
 module.exports = {
+  mode,
   entry: './src/main.js',
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, 'public'),
+    path: path.join(__dirname, 'public'),
   },
   devtool: 'source-map',
   devServer: {
-    contentBase: path.join(__dirname, 'public'),
-    watchContentBase: true,
+    port: 5002,
+    static: {
+      directory: path.join(__dirname, 'public'),
+    }
   }
 };
-
