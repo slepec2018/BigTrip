@@ -1,3 +1,5 @@
+import {createElement} from "../utills.js";
+
 const getTempAddNewEventDestin = () => {
   return `<form class="trip-events__item  event  event--edit" action="#" method="post">
   <header class="event__header">
@@ -175,4 +177,26 @@ const getTempAddNewEventDestin = () => {
 </form>`;
 };
 
-export {getTempAddNewEventDestin};
+class TempAddNewEventDestin {
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return getTempAddNewEventDestin();
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export {TempAddNewEventDestin};

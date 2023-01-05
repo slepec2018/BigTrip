@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import {getRandomNumber, getNumberWithLeadZero} from "../utills.js";
+import {getRandomNumber, getNumberWithLeadZero, createElement} from "../utills.js";
 
 // Функция создания шаблона доп услуг
 const createOffersTemp = (data, count) => {
@@ -87,4 +87,27 @@ const getTempCard = (data) => {
 </li>`;
 };
 
-export {getTempCard};
+class TempCard {
+  constructor(data) {
+    this._element = null;
+    this._data = data;
+  }
+
+  getTemplate() {
+    return getTempCard(this._data);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export {TempCard};

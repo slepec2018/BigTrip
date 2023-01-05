@@ -1,3 +1,5 @@
+import {createElement} from "../utills.js";
+
 const getTempDay = (date, day) => {
   return `<li class="trip-days__item  day">
   <div class="day__info">
@@ -10,4 +12,28 @@ const getTempDay = (date, day) => {
 </li>`;
 };
 
-export {getTempDay};
+class TempDay {
+  constructor(date, day) {
+    this._element = null;
+    this._date = date;
+    this._day = day;
+  }
+
+  getTemplate() {
+    return getTempDay(this._date, this._day);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export {TempDay};

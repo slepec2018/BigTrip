@@ -1,3 +1,5 @@
+import {createElement} from "../utills.js";
+
 const getTempFilters = () => {
   return `<form class="trip-filters" action="#" method="get">
   <div class="trip-filters__filter">
@@ -19,4 +21,26 @@ const getTempFilters = () => {
 </form>`;
 };
 
-export {getTempFilters};
+class TempFilters {
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return getTempFilters();
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export {TempFilters};

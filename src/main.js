@@ -1,14 +1,18 @@
-import {getTempRouteAndCost} from "./components/route_and_cost.js";
-import {getTempFilters} from "./components/filters.js";
-import {getTempMenu} from "./components/menu.js";
-import {getTempSort} from "./components/sort.js";
-// import {getTempAddNewEventDestin} from "./components/ad_new_event_destin.js";
-import {getTempCatalog} from "./components/catalog.js";
-import {getTempDay} from "./components/day.js";
-import {getTempCardEdit} from "./components/card_edit.js";
-import {getTempCard} from "./components/card.js";
+import {TempRouteAndCost} from "./components/route_and_cost.js";
+import {TempFilters} from "./components/filters.js";
+import {TempMenu} from "./components/menu.js";
+import {TempSort} from "./components/sort.js";
+// import {TempAddNewEventDestin} from "./components/ad_new_event_destin.js";
+import {TempCatalog} from "./components/catalog.js";
+import {TempDay} from "./components/day.js";
+import {TempCardEdit} from "./components/card_edit.js";
+import {TempCard} from "./components/card.js";
+import {TempNoPoints} from "./components/no-points.js";
+
 
 import {generateCardData} from "./mock/card_mock.js";
+
+import {render, RenderPosition} from "./utills.js";
 
 import dayjs from "dayjs";
 
@@ -16,7 +20,7 @@ import dayjs from "dayjs";
 const header = document.querySelector(`.page-header`);
 const headerMainTrip = header.querySelector(`.trip-main`);
 const headerMainTripControl = headerMainTrip.querySelector(`.trip-main__trip-controls`);
-const headerMainTripControlFCap = headerMainTrip.querySelector(`.trip-main__trip-controls h2`);
+// const headerMainTripControlFCap = headerMainTrip.querySelector(`.trip-main__trip-controls h2`);
 const main = document.querySelector(`.page-body__page-main`);
 const mainTripEvents = main.querySelector(`.trip-events`);
 
@@ -37,17 +41,12 @@ const points = convertPointsDataUnix(new Array(POINT_COUNT).fill().map(generateC
   return a.eventStartTimeUnix - b.eventStartTimeUnix;
 });
 
-// Функция добавления кода html в исходный код
-const renderTemp = (container, temp, place) => {
-  container.insertAdjacentHTML(place, temp);
-};
-
 // Рендеринг верхнего раздела хедера
-renderTemp(headerMainTrip, getTempRouteAndCost(points), `afterbegin`);
+render(headerMainTrip, new TempRouteAndCost(points).getElement(), RenderPosition.AFTERBEGIN);
 // Рендеринг меню хедера
-renderTemp(headerMainTripControlFCap, getTempMenu(), `afterend`);
+render(headerMainTripControl, new TempMenu().getElement(), RenderPosition.AFTERBEGIN);
 // Рендеринг фильтров хедера
-renderTemp(headerMainTripControl, getTempFilters(), `beforeend`);
+render(headerMainTripControl, new TempFilters().getElement(), RenderPosition.BEFOREEND);
 
 // Переменные раздела фильр хедера
 const tripFilters = headerMainTripControl.querySelector(`.trip-filters`);
@@ -55,12 +54,6 @@ const tripFiltersInput = tripFilters.querySelectorAll(`.trip-filters__filter-inp
 const tripFilterEverything = tripFilters.querySelector(`#filter-everything`);
 const tripFilterFuture = tripFilters.querySelector(`#filter-future`);
 const tripFilterPast = tripFilters.querySelector(`#filter-past`);
-
-// Рендеринг сортировки каталога
-renderTemp(mainTripEvents, getTempSort(), `beforeend`);
-// renderTemp(mainTripEvents, getTempAddNewEventDestin(), `beforeend`);
-// Рендеринг каталога
-renderTemp(mainTripEvents, getTempCatalog(), `beforeend`);
 
 // Функция сбора данных о количестве дней в переданной базе
 const sortDaysDataPoints = (data) => {
@@ -73,34 +66,65 @@ const sortDaysDataPoints = (data) => {
   return Array.from(dayOfDateSet);
 };
 
-// Переменная блока каталога
-const tripCatalog = mainTripEvents.querySelector(`.trip-days`);
+const renderDay = (daysElement, data) => {
+  const day = new TempCard(data);
+  const dayEdit = new TempCardEdit(data);
 
-// Функция заполнения каталога днями и точками отсановок
-const fillCatalog = (data) => {
+  const replaceEditToDay = () => {
+    daysElement.replaceChild(day.getElement(), dayEdit.getElement());
+  };
+
+  const replaceDayToEdit = () => {
+    daysElement.replaceChild(dayEdit.getElement(), day.getElement());
+  };
+
+  const onEscKeyDown = (evt) => {
+    if (evt.key === `Escape` || evt.key === `Esc`) {
+      evt.preventDefault();
+      replaceEditToDay();
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    }
+  };
+
+  day.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
+    replaceDayToEdit();
+    document.addEventListener(`keydown`, onEscKeyDown);
+  });
+
+  dayEdit.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
+    replaceEditToDay();
+    document.addEventListener(`keydown`, onEscKeyDown);
+  });
+
+  render(daysElement, day.getElement(), RenderPosition.BEFOREEND);
+};
+
+// Функция заполнения каталога днями и точками остановок
+const fillCatalog = (data, container) => {
+
+
   const dayOfDate = sortDaysDataPoints(data);
 
   for (let i = 0; i < dayOfDate.length; i++) {
-    renderTemp(tripCatalog, getTempDay(dayOfDate[i], i), `beforeend`);
+    render(container, new TempDay(dayOfDate[i], i).getElement(), RenderPosition.BEFOREEND);
   }
 
-  const tripDays = tripCatalog.querySelectorAll(`.trip-events__list`);
+  const tripDays = container.querySelectorAll(`.trip-events__list`);
 
-  renderTemp(tripDays[0], getTempCardEdit(data[0]), `afterbegin`);
+  console.log(tripDays);
 
-  for (let i = 1; i < data.length; i++) {
+  for (let i = 0; i < data.length; i++) {
     for (let j = 0; j < dayOfDate.length; j++) {
       if (dayOfDate[j] === dayjs(data[i].eventStartTimeFull).format(`DD MMM`)) {
-        renderTemp(tripDays[j], getTempCard(data[i]), `beforeend`);
+        // render(tripDays[j], new TempCard(data[i]).getElement(), RenderPosition.BEFOREEND);
+        renderDay(tripDays[j], data[i]);
       }
     }
   }
 };
 
-fillCatalog(points);
-
 // Функция навешивания события фильтра сортировки каталога
-const filterEventAd = (button, dataStan, condit) => {
+const filterEventAd = (button, dataStan, condit, container) => {
 
   button.addEventListener(`change`, () => {
     for (const item of tripFiltersInput) {
@@ -109,9 +133,9 @@ const filterEventAd = (button, dataStan, condit) => {
 
     button.setAttribute(`checked`, `checked`);
 
-    tripCatalog.innerHTML = ``;
+    container.innerHTML = ``;
     if (dataStan) {
-      fillCatalog(points);
+      fillCatalog(points, container);
       return;
     }
 
@@ -124,11 +148,25 @@ const filterEventAd = (button, dataStan, condit) => {
       return dayjs().isAfter(dayjs(element.eventStartTimeFull));
     });
 
-    fillCatalog(strucData);
+    fillCatalog(strucData, container);
   });
 };
 
-// Добавления события сортировки по фильтрам
-filterEventAd(tripFilterEverything, true, `Before`);
-filterEventAd(tripFilterFuture, false, `Before`);
-filterEventAd(tripFilterPast, false, `After`);
+if (points.length > 0) {
+  // Рендеринг сортировки каталога
+  render(mainTripEvents, new TempSort().getElement(), RenderPosition.BEFOREEND);
+  // Рендеринг каталога
+  render(mainTripEvents, new TempCatalog().getElement(), RenderPosition.BEFOREEND);
+
+  // Переменная блока каталога
+  const tripCatalog = mainTripEvents.querySelector(`.trip-days`);
+
+  fillCatalog(points, tripCatalog);
+
+  // Добавления события сортировки по фильтрам
+  filterEventAd(tripFilterEverything, true, `Before`, tripCatalog);
+  filterEventAd(tripFilterFuture, false, `Before`, tripCatalog);
+  filterEventAd(tripFilterPast, false, `After`, tripCatalog);
+} else {
+  render(mainTripEvents, new TempNoPoints().getElement(), RenderPosition.BEFOREEND);
+}

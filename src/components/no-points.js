@@ -1,17 +1,16 @@
 import {createElement} from "../utills.js";
 
-const getTempCatalog = () => {
-  return `<ul class="trip-days">
-</ul>`;
+const getTempNoPoints = () => {
+  return `<p class="trip-events__msg">Click New Event to create your first point</p>`;
 };
 
-class TempCatalog {
+class TempNoPoints {
   constructor() {
     this._element = null;
   }
 
   getTemplate() {
-    return getTempCatalog();
+    return getTempNoPoints();
   }
 
   getElement() {
@@ -27,4 +26,4 @@ class TempCatalog {
   }
 }
 
-export {TempCatalog};
+export {TempNoPoints};
