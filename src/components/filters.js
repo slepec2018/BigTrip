@@ -1,4 +1,4 @@
-import {createElement} from "../utills.js";
+import {Abstract} from "./abstract.js";
 
 const getTempFilters = () => {
   return `<form class="trip-filters" action="#" method="get">
@@ -21,25 +21,10 @@ const getTempFilters = () => {
 </form>`;
 };
 
-class TempFilters {
-  constructor() {
-    this._element = null;
-  }
+class TempFilters extends Abstract {
 
   getTemplate() {
     return getTempFilters();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

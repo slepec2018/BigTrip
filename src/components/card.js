@@ -1,17 +1,18 @@
 import dayjs from "dayjs";
-import {getRandomNumber, getNumberWithLeadZero, createElement} from "../utills.js";
+import {getNumberWithLeadZero} from "../utils/common.js";
+import {Abstract} from "./abstract.js";
 
 // Функция создания шаблона доп услуг
-const createOffersTemp = (data, count) => {
-  const {title, price} = data;
-
+const createOffersTemp = (data) => {
   const kit = [];
 
-  for (let i = 0; i < count; i++) {
+  for (let i = 0; i < data.length; i++) {
+    const {title, price} = data[i];
+
     const temp = `<li class="event__offer">
-    <span class="event__offer-title">${title[getRandomNumber(0, title.length - 1)]}</span>
+    <span class="event__offer-title">${title}</span>
     &plus;
-    &euro;&nbsp;<span class="event__offer-price">${price[getRandomNumber(0, price.length - 1)]}</span>
+    &euro;&nbsp;<span class="event__offer-price">${price}</span>
    </li>`;
     kit.push(temp);
   }
@@ -77,7 +78,7 @@ const getTempCard = (data) => {
 
     <h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">
-      ${createOffersTemp(addOffer, getRandomNumber(1, 2))}
+      ${createOffersTemp(addOffer)}
     </ul>
 
     <button class="event__rollup-btn" type="button">
@@ -87,26 +88,26 @@ const getTempCard = (data) => {
 </li>`;
 };
 
-class TempCard {
+class TempCard extends Abstract {
   constructor(data) {
-    this._element = null;
+    super();
     this._data = data;
+
+    this._editClickHandler = this._editClickHandler.bind(this);
   }
 
   getTemplate() {
     return getTempCard(this._data);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _editClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.editClick();
   }
 
-  removeElement() {
-    this._element = null;
+  setEditClickHandler(callback) {
+    this._callback.editClick = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._editClickHandler);
   }
 }
 

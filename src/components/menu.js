@@ -1,4 +1,4 @@
-import {createElement} from "../utills.js";
+import {Abstract} from "./abstract.js";
 
 const getTempMenu = () => {
   return `<nav class="trip-controls__trip-tabs  trip-tabs">
@@ -7,25 +7,10 @@ const getTempMenu = () => {
 </nav>`;
 };
 
-class TempMenu {
-  constructor() {
-    this._element = null;
-  }
+class TempMenu extends Abstract {
 
   getTemplate() {
     return getTempMenu();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

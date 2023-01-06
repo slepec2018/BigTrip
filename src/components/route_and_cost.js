@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import {createElement} from "../utills.js";
+import {Abstract} from "./abstract.js";
 
 // Функция выведения суммы всех расходов точек
 const getPriceAmount = (data) => {
@@ -67,26 +67,14 @@ const getTempRouteAndCost = (data) => {
 </section>`;
 };
 
-class TempRouteAndCost {
+class TempRouteAndCost extends Abstract {
   constructor(data) {
-    this._element = null;
+    super();
     this._data = data;
   }
 
   getTemplate() {
     return getTempRouteAndCost(this._data);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

@@ -1,4 +1,10 @@
-import {getRandomNumber, getRandomItemArr, capitalize, getRandomItemsArray, getRandomTags} from "../utills.js";
+import {
+  getRandomNumber,
+  getRandomItemArr,
+  capitalize,
+  getRandomItemsArray,
+  getRandomTags
+} from "../utils/common.js";
 import dayjs from "dayjs";
 
 // Основные данные для формирования мока точки
@@ -64,6 +70,22 @@ const offerPrices = [
   200
 ];
 
+const generateOffers = () => {
+  const list = [];
+
+  for (let i = 0; i < getRandomNumber(1, 2); i++) {
+    const item = {
+      type: getRandomItemArr(cardPointTypes),
+      title: getRandomItemArr(offerTitles),
+      price: getRandomItemArr(offerPrices)
+    };
+
+    list.push(item);
+  }
+
+  return list;
+};
+
 // Функция генерирования мока точки
 const generateCardData = () => {
   const type = getRandomItemArr(cardPointTypes);
@@ -74,16 +96,13 @@ const generateCardData = () => {
   return {
     typeImage: `img/icons/${type}.png`,
     title: `${capitalize(type)} to ${city}`,
+    type: `${capitalize(type)} to`,
     city,
     eventStartTime: dayjs(eventStartTime).format(`YYYY-MM-DDTHH:mm`),
     eventEndTime: dayjs(eventEndTime).format(`YYYY-MM-DDTHH:mm`),
     eventDuration: dayjs(eventEndTime).diff(dayjs(eventStartTime), `minute`),
     price: getRandomNumber(1, 50),
-    addOffer: {
-      type: cardPointTypes,
-      title: offerTitles,
-      price: offerPrices,
-    },
+    addOffer: generateOffers(),
     eventStartTimeFull: eventStartTime,
     eventEndTimeFull: eventEndTime,
     description: getRandomItemsArray(cardTextSentenses, getRandomNumber(1, 3)),

@@ -1,20 +1,19 @@
 import dayjs from "dayjs";
-import {getRandomNumber, createElement} from "../utills.js";
+import {Abstract} from "./abstract.js";
 
 // Функция создания шаблона доп услуг
-const createOffersTemp = (data, count) => {
-  const {type, title, price} = data;
-
-  const typeLabel = type[getRandomNumber(0, type.length - 1)];
+const createOffersTemp = (data) => {
   const kit = [];
 
-  for (let i = 0; i < count; i++) {
+  for (let i = 0; i < data.length; i++) {
+    const {type, title, price} = data[i];
+
     const temp = `<div class="event__offer-selector">
-    <input class="event__offer-checkbox  visually-hidden" id="event-offer-${typeLabel}-1" type="checkbox" name="event-offer-comfort" checked>
+    <input class="event__offer-checkbox  visually-hidden" id="event-offer-${type}-1" type="checkbox" name="event-offer-comfort" checked>
     <label class="event__offer-label" for="event-offer-comfort-1">
-      <span class="event__offer-title">${title[getRandomNumber(0, title.length - 1)]}</span>
+      <span class="event__offer-title">${title}</span>
       &plus;
-      &euro;&nbsp;<span class="event__offer-price">${price[getRandomNumber(0, price.length - 1)]}</span>
+      &euro;&nbsp;<span class="event__offer-price">${price}</span>
     </label>
   </div>`;
     kit.push(temp);
@@ -24,7 +23,7 @@ const createOffersTemp = (data, count) => {
 };
 
 const getTempCardEdit = (data) => {
-  const {typeImage, city, eventStartTimeFull, eventEndTimeFull, price, addOffer} = data;
+  const {typeImage, city, eventStartTimeFull, eventEndTimeFull, price, addOffer, type} = data;
 
   return `<li class="trip-events__item">
   <form class="event  event--edit" action="#" method="post">
@@ -99,7 +98,7 @@ const getTempCardEdit = (data) => {
 
       <div class="event__field-group  event__field-group--destination">
         <label class="event__label  event__type-output" for="event-destination-1">
-          Flight to
+          ${type}
         </label>
         <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${city}" list="destination-list-1">
         <datalist id="destination-list-1">
@@ -150,7 +149,7 @@ const getTempCardEdit = (data) => {
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
         <div class="event__available-offers">
-          ${createOffersTemp(addOffer, getRandomNumber(1, 2))}
+          ${createOffersTemp(addOffer)}
         </div>
       </section>
     </section>
@@ -158,26 +157,26 @@ const getTempCardEdit = (data) => {
 </li>`;
 };
 
-class TempCardEdit {
+class TempCardEdit extends Abstract {
   constructor(data) {
-    this._element = null;
+    super();
     this._data = data;
+
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
   }
 
   getTemplate() {
     return getTempCardEdit(this._data);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit();
   }
 
-  removeElement() {
-    this._element = null;
+  setFormSubmitHandler(callback) {
+    this._callback.formSubmit = callback;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._formSubmitHandler);
   }
 }
 

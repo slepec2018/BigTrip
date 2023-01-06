@@ -1,4 +1,4 @@
-import {createElement} from "../utills.js";
+import {Abstract} from "./abstract.js";
 
 const getTempDay = (date, day) => {
   return `<li class="trip-days__item  day">
@@ -12,27 +12,15 @@ const getTempDay = (date, day) => {
 </li>`;
 };
 
-class TempDay {
+class TempDay extends Abstract {
   constructor(date, day) {
-    this._element = null;
+    super();
     this._date = date;
     this._day = day;
   }
 
   getTemplate() {
     return getTempDay(this._date, this._day);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

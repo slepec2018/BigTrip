@@ -12,7 +12,7 @@ import {TempNoPoints} from "./components/no-points.js";
 
 import {generateCardData} from "./mock/card_mock.js";
 
-import {render, RenderPosition} from "./utills.js";
+import {render, RenderPosition, replace} from "./utils/render.js";
 
 import dayjs from "dayjs";
 
@@ -42,11 +42,11 @@ const points = convertPointsDataUnix(new Array(POINT_COUNT).fill().map(generateC
 });
 
 // Рендеринг верхнего раздела хедера
-render(headerMainTrip, new TempRouteAndCost(points).getElement(), RenderPosition.AFTERBEGIN);
+render(headerMainTrip, new TempRouteAndCost(points), RenderPosition.AFTERBEGIN);
 // Рендеринг меню хедера
-render(headerMainTripControl, new TempMenu().getElement(), RenderPosition.AFTERBEGIN);
+render(headerMainTripControl, new TempMenu(), RenderPosition.AFTERBEGIN);
 // Рендеринг фильтров хедера
-render(headerMainTripControl, new TempFilters().getElement(), RenderPosition.BEFOREEND);
+render(headerMainTripControl, new TempFilters(), RenderPosition.BEFOREEND);
 
 // Переменные раздела фильр хедера
 const tripFilters = headerMainTripControl.querySelector(`.trip-filters`);
@@ -71,11 +71,11 @@ const renderDay = (daysElement, data) => {
   const dayEdit = new TempCardEdit(data);
 
   const replaceEditToDay = () => {
-    daysElement.replaceChild(day.getElement(), dayEdit.getElement());
+    replace(day, dayEdit);
   };
 
   const replaceDayToEdit = () => {
-    daysElement.replaceChild(dayEdit.getElement(), day.getElement());
+    replace(dayEdit, day);
   };
 
   const onEscKeyDown = (evt) => {
@@ -86,17 +86,17 @@ const renderDay = (daysElement, data) => {
     }
   };
 
-  day.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
+  day.setEditClickHandler(() => {
     replaceDayToEdit();
     document.addEventListener(`keydown`, onEscKeyDown);
   });
 
-  dayEdit.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
+  dayEdit.setFormSubmitHandler(() => {
     replaceEditToDay();
     document.addEventListener(`keydown`, onEscKeyDown);
   });
 
-  render(daysElement, day.getElement(), RenderPosition.BEFOREEND);
+  render(daysElement, day, RenderPosition.BEFOREEND);
 };
 
 // Функция заполнения каталога днями и точками остановок
@@ -106,17 +106,14 @@ const fillCatalog = (data, container) => {
   const dayOfDate = sortDaysDataPoints(data);
 
   for (let i = 0; i < dayOfDate.length; i++) {
-    render(container, new TempDay(dayOfDate[i], i).getElement(), RenderPosition.BEFOREEND);
+    render(container, new TempDay(dayOfDate[i], i), RenderPosition.BEFOREEND);
   }
 
   const tripDays = container.querySelectorAll(`.trip-events__list`);
 
-  console.log(tripDays);
-
   for (let i = 0; i < data.length; i++) {
     for (let j = 0; j < dayOfDate.length; j++) {
       if (dayOfDate[j] === dayjs(data[i].eventStartTimeFull).format(`DD MMM`)) {
-        // render(tripDays[j], new TempCard(data[i]).getElement(), RenderPosition.BEFOREEND);
         renderDay(tripDays[j], data[i]);
       }
     }
@@ -154,9 +151,9 @@ const filterEventAd = (button, dataStan, condit, container) => {
 
 if (points.length > 0) {
   // Рендеринг сортировки каталога
-  render(mainTripEvents, new TempSort().getElement(), RenderPosition.BEFOREEND);
+  render(mainTripEvents, new TempSort(), RenderPosition.BEFOREEND);
   // Рендеринг каталога
-  render(mainTripEvents, new TempCatalog().getElement(), RenderPosition.BEFOREEND);
+  render(mainTripEvents, new TempCatalog(), RenderPosition.BEFOREEND);
 
   // Переменная блока каталога
   const tripCatalog = mainTripEvents.querySelector(`.trip-days`);
@@ -168,5 +165,5 @@ if (points.length > 0) {
   filterEventAd(tripFilterFuture, false, `Before`, tripCatalog);
   filterEventAd(tripFilterPast, false, `After`, tripCatalog);
 } else {
-  render(mainTripEvents, new TempNoPoints().getElement(), RenderPosition.BEFOREEND);
+  render(mainTripEvents, new TempNoPoints(), RenderPosition.BEFOREEND);
 }
