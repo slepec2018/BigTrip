@@ -1,8 +1,5 @@
 // Функция рандомного числа из заданного диапазона включая границы
 const getRandomNumber = (min, max) => {
-  if (min < 0 || max < 0 || min >= max) {
-    return NaN;
-  }
 
   const finMin = Math.ceil(Math.min(min, max));
   const finMax = Math.floor(Math.max(min, max));
@@ -23,7 +20,7 @@ const getRandomItemsArray = (arr, count) => {
   const allElements = [];
 
   for (let i = 0; i < count; i++) {
-    const element = arr[getRandomNumber(0, arr.length - 1)];
+    const element = arr[getRandomNumber(1, arr.length - 1)];
     allElements.push(element);
   }
 
@@ -40,10 +37,34 @@ const getRandomTags = (arr, length) => {
   const cycle = getRandomNumber(1, length);
 
   while (set.size !== cycle) {
-    set.add(arr[getRandomNumber(0, arr.length - 1)]);
+    set.add(arr[getRandomNumber(1, arr.length - 1)]);
   }
 
   return Array.from(set);
+};
+
+const createArrPic = (link, len) => {
+  let arr = [];
+
+  for (let i = 0; i < len; i++) {
+    arr.push(link);
+  }
+
+  return arr;
+};
+
+const updateItem = (items, update) => {
+  const index = items.findIndex((item) => item.id === update.id);
+
+  if (index === -1) {
+    return items;
+  }
+
+  return [
+    ...items.slice(0, index),
+    update,
+    ...items.slice(index + 1)
+  ];
 };
 
 export {
@@ -52,5 +73,7 @@ export {
   capitalize,
   getRandomItemsArray,
   getNumberWithLeadZero,
+  createArrPic,
+  updateItem,
   getRandomTags
 };

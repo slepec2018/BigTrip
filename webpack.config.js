@@ -14,5 +14,13 @@ module.exports = {
     static: {
       directory: path.join(__dirname, 'public'),
     }
+  },
+  module: {
+    rules: [
+        {
+            test: /\.css$/i,
+            use: ['style-loader', 'css-loader']
+        }
+    ]
   }
 };

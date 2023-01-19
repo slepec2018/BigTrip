@@ -1,18 +1,14 @@
 import {TempRouteAndCost} from "./components/route_and_cost.js";
 import {TempFilters} from "./components/filters.js";
 import {TempMenu} from "./components/menu.js";
-import {TempSort} from "./components/sort.js";
-// import {TempAddNewEventDestin} from "./components/ad_new_event_destin.js";
-import {TempCatalog} from "./components/catalog.js";
-import {TempDay} from "./components/day.js";
-import {TempCardEdit} from "./components/card_edit.js";
-import {TempCard} from "./components/card.js";
-import {TempNoPoints} from "./components/no-points.js";
 
+import {Board} from "./presenter/board.js";
+
+// import {TempAddNewEventDestin} from "./components/ad_new_event_destin.js";
 
 import {generateCardData} from "./mock/card_mock.js";
 
-import {render, RenderPosition, replace} from "./utils/render.js";
+import {render, RenderPosition} from "./utils/render.js";
 
 import dayjs from "dayjs";
 
@@ -49,11 +45,11 @@ render(headerMainTripControl, new TempMenu(), RenderPosition.AFTERBEGIN);
 render(headerMainTripControl, new TempFilters(), RenderPosition.BEFOREEND);
 
 // Переменные раздела фильр хедера
-const tripFilters = headerMainTripControl.querySelector(`.trip-filters`);
-const tripFiltersInput = tripFilters.querySelectorAll(`.trip-filters__filter-input`);
-const tripFilterEverything = tripFilters.querySelector(`#filter-everything`);
-const tripFilterFuture = tripFilters.querySelector(`#filter-future`);
-const tripFilterPast = tripFilters.querySelector(`#filter-past`);
+// const tripFilters = headerMainTripControl.querySelector(`.trip-filters`);
+// const tripFiltersInput = tripFilters.querySelectorAll(`.trip-filters__filter-input`);
+// const tripFilterEverything = tripFilters.querySelector(`#filter-everything`);
+// const tripFilterFuture = tripFilters.querySelector(`#filter-future`);
+// const tripFilterPast = tripFilters.querySelector(`#filter-past`);
 
 // Функция сбора данных о количестве дней в переданной базе
 const sortDaysDataPoints = (data) => {
@@ -66,104 +62,36 @@ const sortDaysDataPoints = (data) => {
   return Array.from(dayOfDateSet);
 };
 
-const renderDay = (daysElement, data) => {
-  const day = new TempCard(data);
-  const dayEdit = new TempCardEdit(data);
+// // Функция навешивания события фильтра сортировки каталога
+// const filterEventAd = (button, dataStan, condit, container) => {
 
-  const replaceEditToDay = () => {
-    replace(day, dayEdit);
-  };
+//   button.addEventListener(`change`, () => {
+//     for (const item of tripFiltersInput) {
+//       item.removeAttribute(`checked`);
+//     }
 
-  const replaceDayToEdit = () => {
-    replace(dayEdit, day);
-  };
+//     button.setAttribute(`checked`, `checked`);
 
-  const onEscKeyDown = (evt) => {
-    if (evt.key === `Escape` || evt.key === `Esc`) {
-      evt.preventDefault();
-      replaceEditToDay();
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    }
-  };
+//     container.innerHTML = ``;
+//     if (dataStan) {
+//       fillCatalog(points, container);
+//       return;
+//     }
 
-  day.setEditClickHandler(() => {
-    replaceDayToEdit();
-    document.addEventListener(`keydown`, onEscKeyDown);
-  });
+//     const deepData = JSON.parse(JSON.stringify(points));
 
-  dayEdit.setFormSubmitHandler(() => {
-    replaceEditToDay();
-    document.addEventListener(`keydown`, onEscKeyDown);
-  });
+//     const strucData = deepData.filter((element) => {
+//       if (condit === `Before`) {
+//         return dayjs().isBefore(dayjs(element.eventStartTimeFull));
+//       }
+//       return dayjs().isAfter(dayjs(element.eventStartTimeFull));
+//     });
 
-  render(daysElement, day, RenderPosition.BEFOREEND);
-};
+//     fillCatalog(strucData, container);
+//   });
+// };
 
-// Функция заполнения каталога днями и точками остановок
-const fillCatalog = (data, container) => {
+const boardPresenter = new Board(mainTripEvents);
 
+boardPresenter.init(points, sortDaysDataPoints(points));
 
-  const dayOfDate = sortDaysDataPoints(data);
-
-  for (let i = 0; i < dayOfDate.length; i++) {
-    render(container, new TempDay(dayOfDate[i], i), RenderPosition.BEFOREEND);
-  }
-
-  const tripDays = container.querySelectorAll(`.trip-events__list`);
-
-  for (let i = 0; i < data.length; i++) {
-    for (let j = 0; j < dayOfDate.length; j++) {
-      if (dayOfDate[j] === dayjs(data[i].eventStartTimeFull).format(`DD MMM`)) {
-        renderDay(tripDays[j], data[i]);
-      }
-    }
-  }
-};
-
-// Функция навешивания события фильтра сортировки каталога
-const filterEventAd = (button, dataStan, condit, container) => {
-
-  button.addEventListener(`change`, () => {
-    for (const item of tripFiltersInput) {
-      item.removeAttribute(`checked`);
-    }
-
-    button.setAttribute(`checked`, `checked`);
-
-    container.innerHTML = ``;
-    if (dataStan) {
-      fillCatalog(points, container);
-      return;
-    }
-
-    const deepData = JSON.parse(JSON.stringify(points));
-
-    const strucData = deepData.filter((element) => {
-      if (condit === `Before`) {
-        return dayjs().isBefore(dayjs(element.eventStartTimeFull));
-      }
-      return dayjs().isAfter(dayjs(element.eventStartTimeFull));
-    });
-
-    fillCatalog(strucData, container);
-  });
-};
-
-if (points.length > 0) {
-  // Рендеринг сортировки каталога
-  render(mainTripEvents, new TempSort(), RenderPosition.BEFOREEND);
-  // Рендеринг каталога
-  render(mainTripEvents, new TempCatalog(), RenderPosition.BEFOREEND);
-
-  // Переменная блока каталога
-  const tripCatalog = mainTripEvents.querySelector(`.trip-days`);
-
-  fillCatalog(points, tripCatalog);
-
-  // Добавления события сортировки по фильтрам
-  filterEventAd(tripFilterEverything, true, `Before`, tripCatalog);
-  filterEventAd(tripFilterFuture, false, `Before`, tripCatalog);
-  filterEventAd(tripFilterPast, false, `After`, tripCatalog);
-} else {
-  render(mainTripEvents, new TempNoPoints(), RenderPosition.BEFOREEND);
-}

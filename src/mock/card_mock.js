@@ -1,9 +1,8 @@
 import {
   getRandomNumber,
   getRandomItemArr,
-  capitalize,
   getRandomItemsArray,
-  getRandomTags
+  createArrPic
 } from "../utils/common.js";
 import dayjs from "dayjs";
 
@@ -77,7 +76,9 @@ const generateOffers = () => {
     const item = {
       type: getRandomItemArr(cardPointTypes),
       title: getRandomItemArr(offerTitles),
-      price: getRandomItemArr(offerPrices)
+      price: getRandomItemArr(offerPrices),
+      id: i,
+      isOfferCheck: true
     };
 
     list.push(item);
@@ -86,17 +87,23 @@ const generateOffers = () => {
   return list;
 };
 
+// Date.now() и Math.random() - плохие решения для генерации id
+// в "продуктовом" коде, а для моков самое то.
+// Для "продуктового" кода используйте что-то понадежнее,
+// вроде nanoid - https://github.com/ai/nanoid
+const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
+
 // Функция генерирования мока точки
 const generateCardData = () => {
   const type = getRandomItemArr(cardPointTypes);
   const city = getRandomItemArr(cardCitys);
-  const eventStartTime = dayjs().add(getRandomNumber(1, 4), `day`).add(getRandomNumber(0, 24), `hour`).add(getRandomNumber(0, 60), `minute`).toDate();
-  const eventEndTime = dayjs(eventStartTime).add(getRandomNumber(0, 24), `hour`).add(getRandomNumber(0, 60), `minute`).toDate();
+  const eventStartTime = dayjs().add(getRandomNumber(1, 4), `day`).add(getRandomNumber(1, 24), `hour`).add(getRandomNumber(1, 60), `minute`).toDate();
+  const eventEndTime = dayjs(eventStartTime).add(getRandomNumber(1, 24), `hour`).add(getRandomNumber(1, 60), `minute`).toDate();
 
   return {
-    typeImage: `img/icons/${type}.png`,
-    title: `${capitalize(type)} to ${city}`,
-    type: `${capitalize(type)} to`,
+    id: generateId(),
+    type,
+    // type: `${capitalize(type)} to`,
     city,
     eventStartTime: dayjs(eventStartTime).format(`YYYY-MM-DDTHH:mm`),
     eventEndTime: dayjs(eventEndTime).format(`YYYY-MM-DDTHH:mm`),
@@ -106,8 +113,9 @@ const generateCardData = () => {
     eventStartTimeFull: eventStartTime,
     eventEndTimeFull: eventEndTime,
     description: getRandomItemsArray(cardTextSentenses, getRandomNumber(1, 3)),
-    photos: getRandomTags(cardImagesUrl, getRandomNumber(1, 10))
+    photos: createArrPic(cardImagesUrl, getRandomNumber(1, 10)),
+    isFavorite: false
   };
 };
 
-export {generateCardData};
+export {generateCardData, cardCitys};

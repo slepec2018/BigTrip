@@ -1,5 +1,7 @@
 import {Abstract} from "./abstract.js";
 
+import {remove} from "../utils/render.js";
+
 const getTempDay = (date, day) => {
   return `<li class="trip-days__item  day">
   <div class="day__info">
@@ -21,6 +23,10 @@ class TempDay extends Abstract {
 
   getTemplate() {
     return getTempDay(this._date, this._day);
+  }
+
+  destroy() {
+    remove(this._element);
   }
 }
 

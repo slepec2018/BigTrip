@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import {getNumberWithLeadZero} from "../utils/common.js";
+import {getNumberWithLeadZero, capitalize} from "../utils/common.js";
 import {Abstract} from "./abstract.js";
 
 // Функция создания шаблона доп услуг
@@ -21,7 +21,9 @@ const createOffersTemp = (data) => {
 };
 
 // Функция создания шаблона полного времени точки из базы
-const getCalcDuratData = (min) => {
+const getCalcDuratData = (eventStartTime, eventEndTime) => {
+  const min = dayjs(eventEndTime).diff(dayjs(eventStartTime), `minute`);
+
   let days = 0;
   let hours = 0;
   let minutes = 0;
@@ -45,13 +47,12 @@ const getCalcDuratData = (min) => {
 
 const getTempCard = (data) => {
   const {
-    typeImage,
-    title,
+    type,
+    city,
     eventStartTime,
     eventStartTimeFull,
     eventEndTime,
     eventEndTimeFull,
-    eventDuration,
     price,
     addOffer
   } = data;
@@ -59,9 +60,9 @@ const getTempCard = (data) => {
   return `<li class="trip-events__item">
   <div class="event">
     <div class="event__type">
-      <img class="event__type-icon" width="42" height="42" src="${typeImage}" alt="Event type icon">
+      <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
     </div>
-    <h3 class="event__title">${title}</h3>
+    <h3 class="event__title">${capitalize(type)} to ${city}</h3>
 
     <div class="event__schedule">
       <p class="event__time">
@@ -69,7 +70,7 @@ const getTempCard = (data) => {
         &mdash;
         <time class="event__end-time" datetime="${eventEndTime}">${dayjs(eventEndTimeFull).format(`HH:mm`)}</time>
       </p>
-      <p class="event__duration">${getCalcDuratData(eventDuration)}</p>
+      <p class="event__duration">${getCalcDuratData(eventStartTimeFull, eventEndTimeFull)}</p>
     </div>
 
     <p class="event__price">
