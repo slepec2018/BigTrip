@@ -1,5 +1,4 @@
 import {TempRouteAndCost} from "./components/route_and_cost.js";
-import {TempFilters} from "./components/filters.js";
 import {TempMenu} from "./components/menu.js";
 
 import {Board} from "./presenter/board.js";
@@ -41,8 +40,6 @@ const points = convertPointsDataUnix(new Array(POINT_COUNT).fill().map(generateC
 render(headerMainTrip, new TempRouteAndCost(points), RenderPosition.AFTERBEGIN);
 // Рендеринг меню хедера
 render(headerMainTripControl, new TempMenu(), RenderPosition.AFTERBEGIN);
-// Рендеринг фильтров хедера
-render(headerMainTripControl, new TempFilters(), RenderPosition.BEFOREEND);
 
 // Переменные раздела фильр хедера
 // const tripFilters = headerMainTripControl.querySelector(`.trip-filters`);
@@ -50,17 +47,6 @@ render(headerMainTripControl, new TempFilters(), RenderPosition.BEFOREEND);
 // const tripFilterEverything = tripFilters.querySelector(`#filter-everything`);
 // const tripFilterFuture = tripFilters.querySelector(`#filter-future`);
 // const tripFilterPast = tripFilters.querySelector(`#filter-past`);
-
-// Функция сбора данных о количестве дней в переданной базе
-const sortDaysDataPoints = (data) => {
-  const dayOfDateSet = new Set();
-
-  for (const item of data) {
-    dayOfDateSet.add(dayjs(item.eventStartTime).format(`DD MMM`));
-  }
-
-  return Array.from(dayOfDateSet);
-};
 
 // // Функция навешивания события фильтра сортировки каталога
 // const filterEventAd = (button, dataStan, condit, container) => {
@@ -91,7 +77,7 @@ const sortDaysDataPoints = (data) => {
 //   });
 // };
 
-const boardPresenter = new Board(mainTripEvents);
+const boardPresenter = new Board(mainTripEvents, headerMainTripControl);
 
-boardPresenter.init(points, sortDaysDataPoints(points));
+boardPresenter.init(points);
 
